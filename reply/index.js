@@ -34,28 +34,29 @@ module.exports = () => {
       const jsData = parseXMLData(xmlData)
       const userData = reviewJsData(jsData)
       let options = {
-        ToUserName: userData.FromUserName,
-        FromUserName: userData.ToUserName,
-        CreateTime: Date.now(),
-        MsgType: 'text',
-        Content:'一脸懵逼'
+        toUserName: userData.FromUserName,
+        fromUserName: userData.ToUserName,
+        createTime: Date.now(),
+        msgType: 'text',
+        content:'一脸懵逼'
       }
       if(userData.Content === '牛逼'){
-        options.Content += '你牛逼,你闪电,你拿几把戳电线'
+        options.content += '你牛逼,你闪电,你拿几把戳电线'
       }else if(userData.Content&&userData.Content.indexOf('摸鱼') !== -1){
-        options.Content += '摸鱼一时爽,一直摸一直爽'
+        options.content += '摸鱼一时爽,一直摸一直爽'
       }
       if (userData.MsgType === 'image') {
         //将用户发送的图片，返回回去
         options.mediaId = userData.MediaId;
-        options.type = 'image';
+        options.msgType = 'image';
       }
       if(userData.MsgType === 'voice'){
         options.mediaId = userData.MediaId;
-        options.type = 'voice';
+        options.msgType = 'voice';
       }
       const replyMessage =  template(options)
       res.send(replyMessage)
+      console.log(replyMessage)
     }else {
       res.send('error')
     }

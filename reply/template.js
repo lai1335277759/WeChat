@@ -4,28 +4,28 @@
 
 module.exports = (options) => {
   let replyMessage = `<xml>
-<ToUserName><![CDATA[${options.ToUserName}]]></ToUserName>
-<FromUserName><![CDATA[${options.FromUserName}]]></FromUserName>
-<CreateTime>${options.CreateTime}</CreateTime>
-<MsgType><![CDATA[${options.MsgType}]]></MsgType>\n`
+<ToUserName><![CDATA[${options.toUserName}]]></ToUserName>
+<FromUserName><![CDATA[${options.fromUserName}]]></FromUserName>
+<CreateTime>${options.createTime}</CreateTime>
+<MsgType><![CDATA[${options.msgType}]]></MsgType>\n`
 
-  if(options.MsgType === 'text'){
-    replyMessage += `<Content><![CDATA[${options.Content}]]></Content>`
-  }else if(options.MsgType === 'image'){
+  if(options.msgType === 'text'){
+    replyMessage += `<Content><![CDATA[${options.content}]]></Content>`
+  }else if(options.msgType === 'image'){
     replyMessage += `<Image>
-    <MediaId><![CDATA[${options.mediaId}]></MediaId>
+    <MediaId><![CDATA[${options.mediaId}]]></MediaId>
   </Image>`
-  }else if(options.MsgType === 'voice'){
+  }else if(options.msgType === 'voice'){
     replyMessage += `<Voice>
     <MediaId><![CDATA[${options.mediaId}]]></MediaId>
   </Voice>`
-  }else if(options.MsgType === 'video'){
+  }else if(options.msgType === 'video'){
     replyMessage += `<Video>
     <MediaId><![CDATA[${options.mediaId}]]></MediaId>
     <Title><![CDATA[${options.Title}]]></Title>
     <Description><![CDATA[${options.description}]]></Description>
   </Video>`
-  }else if(options.MsgType === 'music'){
+  }else if(options.msgType === 'music'){
     replyMessage += `<Music>
     <Title><![CDATA[${options.Title}]]></Title>
     <Description><![CDATA[${options.description}]]></Description>
@@ -33,7 +33,7 @@ module.exports = (options) => {
     <HQMusicUrl><![CDATA[${options.hqMusicUrl}]]></HQMusicUrl>
     <ThumbMediaId><![CDATA[${options.mediaId}]]></ThumbMediaId>
   </Music>`
-  }else if(options.MsgType === 'news'){
+  }else if(options.msgType === 'news'){
     replyMessage +=  `<ArticleCount>${options.content.length}</ArticleCount>
       <Articles>`
      options.content.reduce((prev,curr) => {
