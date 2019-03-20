@@ -31,14 +31,14 @@ module.exports = (userData) => {
   }else if(userData.MsgType === 'event'){
     if(userData.Event === 'subscribe'){
       //关注事件
-      options.content = '你好,欢迎关注公众号!'
+      options.content = '来了,老弟!'
       if(userData.EventKey){
-        options.content = '你好,欢迎扫码关注公众号!'
+        options.content = '来了,老弟!!'
       }
     }else if(userData.Event === 'unsubscribe'){
       options.content = ''
     }else if(userData.Event === 'CLICK'){
-      options.content = '网络故障 稍后再试'
+      options.content = 'https://music.163.com/'
     }
   }
 
