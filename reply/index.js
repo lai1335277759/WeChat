@@ -5,6 +5,7 @@
 const sha1 = require('sha1')
 
 const template = require('./template')
+const handleResponse = require('./handleResponse')
 const {getUserDataAsync,parseXMLData,reviewJsData} = require('../utils/tools')
 
 module.exports = () => {
@@ -31,29 +32,13 @@ module.exports = () => {
       }
       //利用 async 特性 获取 xmlData
       const xmlData = await getUserDataAsync(req)
+      // 将xml格式转换成JS对象
       const jsData = parseXMLData(xmlData)
+      // 格式化获取到的用户信息
       const userData = reviewJsData(jsData)
-      let options = {
-        toUserName: userData.FromUserName,
-        fromUserName: userData.ToUserName,
-        createTime: Date.now(),
-        msgType: 'text',
-        content:'一脸懵逼'
-      }
-      if(userData.Content === '牛逼'){
-        options.content += '你牛逼,你闪电,你拿几把戳电线'
-      }else if(userData.Content&&userData.Content.indexOf('摸鱼') !== -1){
-        options.content += '摸鱼一时爽,一直摸一直爽'
-      }
-      if (userData.MsgType === 'image') {
-        //将用户发送的图片，返回回去
-        options.mediaId = userData.MediaId;
-        options.msgType = 'image';
-      }
-      if(userData.MsgType === 'voice'){
-        options.mediaId = userData.MediaId;
-        options.msgType = 'voice';
-      }
+      // 处理用户数据 返回响应信息
+      const options = handleResponse(userData)
+      // 处理6种信息 并返回响应
       const replyMessage =  template(options)
       res.send(replyMessage)
       console.log(replyMessage)
