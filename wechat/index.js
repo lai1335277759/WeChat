@@ -7,6 +7,8 @@ const rq = require('request-promise-native')
 //引入access-token
 const  fetchAccessToken = require('./access-token')
 
+const URL_PREFIX = 'https://api.weixin.qq.com/cgi-bin/'
+
 const menu =  {
   "button":[
     {
@@ -66,25 +68,60 @@ const menu =  {
     }
   ]
 }
-//创建  创建菜单前必须删除之前的菜单
+//创建菜单  创建菜单前必须删除之前的菜单
 async function createMenu() {
   const {access_token} = await fetchAccessToken()
-  const url = `https://api.weixin.qq.com/cgi-bin/menu/create?access_token=${access_token}`
+  const url = `${URL_PREFIX}menu/create?access_token=${access_token}`
   const result = rq({method:'POST', url, json:true, body:menu})
   return result
 }
-//删除
+//删除菜单
 async function deleteMenu() {
   const {access_token} = await fetchAccessToken()
-  const url = `https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=${access_token}`
+  const url = `${URL_PREFIX}menu/delete?access_token=${access_token}`
   const result = rq({method:'GET', url, json:true})
   return result
 }
+//创建标签
+async function createUsersTag(name) {
+  const {access_token} = await fetchAccessToken()
+  const url = `${URL_PREFIX}tags/create?access_token=${access_token}`
+  return await rq({method:'POST', url, json: true,body:{tag: {name} }})
+}
+//添加用户到标签
+async function batchUsersTag(openid_list,tagid) {
+  const {access_token} = await fetchAccessToken()
+  const url = `${URL_PREFIX}tags/members/batchtagging?access_token=${access_token}`
+  return await rq({method:'POST', url, json: true,body:{openid_list ,tagid}})
+}
+// 获取标签下的用户
+async function getTagUsers(tagid,next_openid = '') {
+  const {access_token} = await fetchAccessToken()
+  const url = `${URL_PREFIX}user/tag/get?access_token=${access_token}`
+  return await rq({method:'POST', url, json: true,body:{ tagid ,next_openid}})
+}
+//消息群发
+async function sendMessage(body) {
+  // 获取access_token
+  const { access_token } = await fetchAccessToken();
+  // 定义请求
+  const url = `${URL_PREFIX}message/mass/sendall?access_token=${access_token}`;
+  // 发送请求
+  return await rq({method: 'POST', url, json: true, body});
+}
 // 测试
 
-// (async () => {
-//   let result = await deleteMenu()
-//   console.log(result)
-//   result = await createMenu()
-//   console.log(result)
-// })()
+(async () => {
+  const body = {
+    "filter":{
+      "is_to_all":false,  // 是否添加进历史记录
+      "tag_id": 100
+    },
+    "text":{
+      "content": '测试群发消息~ \n点击提前学习后面的课程 \n<a href="https://segmentfault.com/a/1190000018534625">webpack4开发教程</a>'
+    },
+    "msgtype":"text"
+  }
+  let result = await sendMessage(body)
+  console.log(result)
+})()
