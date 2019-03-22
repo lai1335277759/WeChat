@@ -7,13 +7,12 @@ const sha1 = require('sha1')
 const template = require('./template')
 const handleResponse = require('./handleResponse')
 const {getUserDataAsync,parseXMLData,reviewJsData} = require('../utils/tools')
+const {token} = require('../config')
 
 module.exports = () => {
   return async (req,res) => {
     //获取 signature(加密签名) timestamp(时间戳) nonce(随机数字) echostr(微信后台生成的随机字符串)
     const {signature,echostr,timestamp,nonce} = req.query
-    //token 接口配置信息
-    const token = 'Wechat-liuxing'
     //将这三个参数进行排序 拼接并加密
     const sha1Str = sha1([token,timestamp,nonce].sort().join(''))
     //判断请求方式 'get' 是服务器发送的请求 'post' 是用户发送的请求

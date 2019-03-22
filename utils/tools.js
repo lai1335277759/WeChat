@@ -3,6 +3,11 @@
 */
 //引入xml2js库将xml文件转成js对象
 const {parseString} = require('xml2js')
+//利用 fs 文件系统 存 取 access_token
+const {writeFile,readFile} = require('fs')
+
+const {resolve} = require('path')
+
 
 module.exports = {
   /**
@@ -55,5 +60,40 @@ module.exports = {
       userData[key] = value[0]
     }
     return userData
+  },
+
+  /**
+   *
+   * @param filePath //文件路径
+   * @param data  数据
+   * @returns {promise}
+   */
+  writeFileAsync(filePath,data) {
+    filePath = resolve(__dirname,'../wechat',filePath)
+    return writeFile(filePath,JSON.stringify(data),err => {
+      if(!err)console.log('文件保存成功')
+      else console.log(err)
+    })
+
+  },
+  /**
+   *
+   * @param filePath //文件路径
+   * @returns {promise}
+   */
+  readFileAsync(filePath) {
+    filePath = resolve(__dirname,'../wechat',filePath)
+    return new Promise((resolve,reject) => {
+      readFile(filePath,(err,data) => {
+        if(!err){
+          //将 json 对象转为 JS 对象
+          resolve(JSON.parse(data.toString()))
+        }else{
+          reject(err)
+        }
+      })
+    })
   }
+
 }
+

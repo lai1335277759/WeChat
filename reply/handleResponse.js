@@ -1,7 +1,7 @@
 /*
 处理用户数据,返回响应信息
 */
-
+const {url} = require('../config')
 module.exports = (userData) => {
   let options = {
     toUserName: userData.FromUserName,
@@ -16,6 +16,8 @@ module.exports = (userData) => {
       options.content = '你牛逼,你闪电,你拿几把戳电线'
     }else if(userData.Content&&userData.Content.indexOf('摸鱼') !== -1){
       options.content = '摸鱼一时爽,一直摸一直爽'
+    }else if(userData.Content === '13'){
+      options.content = `${url}/search`
     }
   }else if (userData.MsgType === 'image') {
     //将用户发送的图片，返回回去

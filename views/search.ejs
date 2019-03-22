@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search</title>
+</head>
+
+<body>
+<button id="btn">点击录音</button>
+<ul id="list"></ul>
+</body>
+<script type="text/javascript" src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js"></script>
+<script type="text/javascript">
+  $(function () {
+    // alert(<%= signature %> )
+    wx.config({
+      debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+      appId: 'wx873ef112342fdd3c', // 必填，公众号的唯一标识
+      timestamp: `<%= timestamp %>`, // 必填，生成签名的时间戳
+      nonceStr: `<%= noncestr %>`, // 必填，生成签名的随机串
+      signature: `<%= signature %>`,// 必填，签名
+      jsApiList: [
+        'updateAppMessageShareData',
+        'updateTimelineShareData',
+        'startRecord',
+        'stopRecord',
+        'translateVoice',
+      ] // 必填，需要使用的JS接口列表
+    });
+    let isRecord = false;
+    $('#btn').tap(function () {
+      if (isRecord) {
+        // 之前有录音， 现在结束录音
+        // 结束录音
+        wx.stopRecord({
+          success: function (res) {
+            // 成功的回调函数
+            var localId = res.localId;
+            // 翻译录音
+            wx.translateVoice({
+              localId: localId, // 需要识别的音频的本地Id，由录音相关接口获得
+              isShowProgressTips: 1, // 默认为1，显示进度提示
+              success: function (res) {
+                alert(res.translateResult); // 语音识别的结果
+                $.getJSON(`https://api.douban.com/v2/movie/search?q=${res.translateResult}&count=9&callback=?`, function (data) {
+                  const { subjects } = data;
+                  console.log(data, subjects)
+                  const html = subjects.reduce((prev, curr) => {
+                    return prev + `<li>
+                      <img src="${curr.images.small}" alt="${curr.title}">
+                      <a href="${curr.alt}">${curr.title}</a>
+                      <p>电影评分: ${curr.rating.average}</p>
+                      </li>`;
+                  }, '');
+                  wx.updateAppMessageShareData({
+                    title: '兄弟', // 分享标题
+                    desc: '电影评分:9.9 ', // 分享描述
+                    link: 'http://86d36d5d.ngrok.io/search', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                    imgUrl: 'http://86d36d5d.ngrok.io/1.png', // 分享图标
+                    success: function () {
+                      // 设置成功
+                      alert('分享成功');
+                    },
+                    fail: function (err) {
+                      alert(err);
+                      // 分享失败
+                      alert('分享失败')
+                    }
+                  });
+
+                  wx.updateTimelineShareData({
+                    title: '兄弟', // 分享标题
+                    link: 'http://86d36d5d.ngrok.io/search', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                    imgUrl: 'http://86d36d5d.ngrok.io/1.png', // 分享图标
+                    success: function () {
+                      // 设置成功
+                    }
+                  })
+                  $('#list').html(html);
+
+                })
+              }
+            });
+            isRecord = false;
+          }
+        });
+      } else {
+        // 开始录音
+        wx.startRecord();
+        isRecord = true;
+      }
+    });
+
+    // 开发中测试接口是否可以使用 只会调用一次
+    wx.checkJsApi({
+      jsApiList: ['updateAppMessageShareData',
+        'updateTimelineShareData',
+        'startRecord',
+        'stopRecord',
+        'translateVoice',
+      ], // 需要检测的JS接口列表，所有JS接口列表见附录2,
+      success: function (res) {
+        // 以键值对的形式返回，可用的api值true，不可用为false
+        // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+        console.log(res);
+      }
+    });
+  })
+</script>
+
+</html>
